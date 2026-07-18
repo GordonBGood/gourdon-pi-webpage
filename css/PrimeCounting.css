@@ -1,0 +1,30 @@
+html,
+body {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-weight: bold;
+  font-size: 120%;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 150%;
+}
+
+.input {
+  font-size: 100%;
+  padding:5px 15px 5px 15px;
+}
+
+.output {
+  padding:7px 15px 7px 15px;
+}
+
+.doit {
+  font-weight: bold;
+  font-size: 110%;
+  border:3px solid black;
+  background:#F0E5D1;
+  padding:7px 15px 7px 15px;
+}
