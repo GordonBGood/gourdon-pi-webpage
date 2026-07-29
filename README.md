@@ -34,7 +34,7 @@ Understand that $$P_a$$ is the product of all of the primes up to the square roo
 
 It is not clear whether Legendre actually used "Partial Sieving" in his hand calculation of the number of primes to a million, although he certainly used some optimizations to reduce them.  If the above formula is used without some terminating conditions, it can't be used practically:  the number of operations implied by the above formula without a terminating condition is immense, even counting just to a million as it is the factorial of the number of primes to the square root of the limit, or 168 for the square root of a million of one thousand (167 for odds-only), which is a huge number with about 300 zeros - more operations than there are atoms in the observable universe!  However, many of these combinations are eliminated just by stopping expanding when the ${d}$ product is greater than the counting limit, in which case the contribution is zero, or even better by stopping when ${x}/{d} <= {lpf}$ where ${lpf}$ is the least prime factor of ${p_i}$ in the expansion expression; for the first condition, the number of division operations are reduced to just `95,733` for the first termination condition and `15,321` for the second, both when using the non "Partial Sieving" implementation of Phi finding the number of primes to a million.  With even the second strong termination, this would have taken Legendre a few years to hand calculate; with "Partial Sieving", the number of operations is reduced to just `2,408` operations to find the number of primes to a million that could have been hand calculation in a few months.  It isn't clear that Legendre actaully used "Partial Sieving", in which case his math error in so many hand calculations could easily have occurred as even with the strong termination condition, there are about 720 combinations of the smallest primes he would have had to process along with the loop over all the multiple by all the primes up to the terminating condition, but all major prime counting algorithms since then, including Meissel's hand calculation of the count of primes to a billion (1,000,000,000), would have used it, with the exception of the first computer adaptation of the algorithms by DH Lehmer, who only used bottom-up recursion with the strong termination condition in calculating Phi.
 
-Rather than confuse the description of the implementation of the algorithms with more words, here are a Python-as-pseudocode implementations of some implementing code for bottom-up recursive Phi calculation; where a "bottom-up" implementation is the superior choice because it doesn't require memoization/caching of intermediate values to avoid exponentially slower execution with increasing counting range.
+Rather than confuse the description of the implementation of the algorithms with more words, here are a Python-as-pseudocode implementation code for bottom-up recursive Phi calculation; where a "bottom-up" implementation is the superior choice because it doesn't require memoization/caching of intermediate values to avoid exponentially slower execution with increasing counting range.
 
 The recursive formula for Phi is as follows:
 
@@ -56,7 +56,7 @@ def phi(x, a):
         phi = 0
         for pi in range(lpfi, lpfisz):
             p = prms[pi]; nm = m * p
-#                if nm > sqrtlmt: return phi # weaker termination condition!
+#            if nm > sqrtlmt: return phi # weaker termination condition!
             if p * nm >= limit: return phi + lpfisz - pi # strong termination!
             phi += tinyphi(lmt // nm)
             phi -= lvl(0, pi, nm)
@@ -64,21 +64,11 @@ def phi(x, a):
     return tinyphi(x) - lvl(0, a - 1, 1) # one less than `a` because odds-only!
 ```
 
-However, as mentioned, recursion wasn't really a concept in the days of Legendre so he would have implemented it with looping procedurally with what would eventually be a last-in/first-out "stack" replaced by a few memory locations (lines on a piece of paper).  a Python-as-pseudocode implementation with strong termination of looping replacing recursion is as follows - not that this has just as many operations, just doesn't need functions and slacks:
-
-```
-TO BE PROVIDED LATER!!!
-```
+However, as mentioned, recursion wasn't really a concept in the days of Legendre so he would have implemented it with looping procedurally with what would eventually be a last-in/first-out "stack" replaced by a few memory locations (lines on a piece of paper).  DH Lehmer in his adaptation of prime counting function to use by computer programs also used recursive Phi calculations and also used a memory based pseudo "stack" of an array of memory locations because the early mainframe computer on which he worked also didn't have functions nor an automatic stack.  Do note that these implementations use many more division operations than a "Partial Sieve" based implementation.
 
 The recursive definition and implementation of Phi is so simple that computer programmers fall into the trap of using it, ignoring the poor execution complexity.  Even in this bottom-up implementation, this expression has an asymptotic complexity of `O(x/((log x)**2))`.  With increasing counting range, this builds much much faster than the non-recursive formula; these formulas use memory of `O(x/(log x))` for the array of primes but require memory use of`O(x**(1/2))` due to the need to SoE sieve to the square root of the counting range in order to find the base primes (although it might be smaller by a constant factor if the sieve is implemented to use just one bit per odd number representation) and increased amount by a constant factor for the non-recursive implementations that require other arrays of this size.
 
-For Legendre's case in using his formula to find the number of primes to a million, the square root of a million is just a thousand, his array(s) would only have needed 500 elements for odds-only from which the 167 odd primes could have been determined, and his small culling base primes would have only gone up to 31 with the values of 3, 5, 7, 11, 13, 17, 19, 23, 29, and 31.  One can play with these algorithms in Python for to see the difference as [the non-recursive Legendre algorithm](https://wandbox.org/permlink/B40zkHgGgn3YBvtT) and [the recursive Legendre algorithm](https://wandbox.org/permlink/Afl7y4II6Uf3QRqk).  Note that for ease of computation, this Python non-recursive program uses another method based on k-rough numbers and additional tables of the same size as that described containing count intermediate count values so that the Moebius function doesn't need to be evaluated.  Legendre would not have used this implementation as k-rough numbers had not been investigated yet in his time, but an equivalent implementation using a "factors" array of that same size containing values for the least prime factors and the Moebius function values for each represented odd number can be used
-
-A Python-as-pseudocode implementation of the Legendre algorithm using "Partial Sieving" is as follows, written as Legendre might have done it if he used "Partial Sieving":
-
-```
-TO BE PROVIDED LATER!!!
-```
+For Legendre's case in using his formula to find the number of primes to a million, the square root of a million is just a thousand, his "array(s)" would only have needed 500 elements for odds-only from which the 167 odd primes could have been determined, and his small culling base primes would have only gone up to 31 with the values of 3, 5, 7, 11, 13, 17, 19, 23, 29, and 31.  One can play with these algorithms in Python for to see the difference as [the recursive Legendre algorithm](https://wandbox.org/permlink/Afl7y4II6Uf3QRqk) and [the non-recursive Legendre algorithm](https://wandbox.org/permlink/vaPO1vOC6hTuEy9q) .  Note that this implementation uses a "factors" array indexed as the odd values up to the square root of the counting range and that each element of this "factors" array contains values for the least prime factors and the Moebius function values for each represented odd number in this range. Also note that the recursive implementation takes 15,321 and the Partial Sieving implementation takes 2,753 division operations, respectively, to count the number of primes to a million.
 
 ### Meissel's Prime Counting Algorithm
 
